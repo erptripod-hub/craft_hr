@@ -69,9 +69,14 @@ def get_earned_leave(employee=None):
             }
         )
 
-        doc.new_leaves_allocated = earned_leaves - doc.custom_opening_used_leaves
-        doc.custom_used_leaves = doc.custom_opening_used_leaves + new_used_leaves
-        doc.custom_available_leaves = doc.new_leaves_allocated - new_used_leaves
-
-        doc.save()
+       doc.new_leaves_allocated = round(earned_leaves - doc.custom_opening_used_leaves, 2)
+        doc.custom_used_leaves = round(doc.custom_opening_used_leaves + new_used_leaves, 2)
+        doc.custom_available_leaves = round(doc.new_leaves_allocated - new_used_leaves, 2)
+        
+        # Use db_set instead of save to bypass validation
+        frappe.db.set_value('Leave Allocation', doc.name, {
+            'new_leaves_allocated': doc.new_leaves_allocated,
+            'custom_used_leaves': doc.custom_used_leaves,
+            'custom_available_leaves': doc.custom_available_leaves
+        }, update_modified=True)
         frappe.db.commit()
