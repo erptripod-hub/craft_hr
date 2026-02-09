@@ -46,7 +46,9 @@ def get_earned_leave(employee=None):
             to_date = doc.to_date
         earned_leaves = get_leaves(doc.custom_date_of_joining, to_date, doc.custom_leave_distribution_template)
         new_used_leaves = frappe.db.count('Attendance',{'employee':doc.employee,'leave_type':doc.leave_type,'docstatus':1,'attendance_date':['between',[doc.from_date,doc.to_date]]})
-        doc.new_leaves_allocated = earned_leaves - doc.custom_opening_used_leaves
-        doc.custom_used_leaves = doc.custom_opening_used_leaves + new_used_leaves
-        doc.custom_available_leaves = doc.new_leaves_allocated - new_used_leaves
-        doc.save()
+     doc.new_leaves_allocated = earned_leaves - doc.custom_opening_used_leaves
+doc.custom_used_leaves = doc.custom_opening_used_leaves + new_used_leaves
+doc.custom_available_leaves = doc.new_leaves_allocated - new_used_leaves
+
+doc.save()
+frappe.db.commit()
