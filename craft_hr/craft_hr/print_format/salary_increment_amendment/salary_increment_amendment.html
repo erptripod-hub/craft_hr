@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            padding: 40px;
+        }
+        .header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14pt;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+        .sub-header {
+            text-align: center;
+            font-size: 10pt;
+            margin-bottom: 30px;
+        }
+        .field-row {
+            margin: 15px 0;
+            display: flex;
+        }
+        .field-label {
+            width: 200px;
+            font-weight: bold;
+        }
+        .field-value {
+            flex: 1;
+            border-bottom: 1px solid #000;
+            min-height: 20px;
+        }
+        .content {
+            margin: 30px 0;
+            text-align: justify;
+        }
+        .details-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        .details-table td {
+            padding: 8px;
+            border: 1px solid #000;
+        }
+        .details-table td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+        .signature-section {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-box {
+            width: 45%;
+        }
+        .signature-line {
+            border-bottom: 2px dotted #000;
+            margin-top: 80px;
+            text-align: center;
+        }
+        .company-stamp {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .company-stamp img {
+            max-width: 150px;
+            max-height: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        AMENDMENT TO EMPLOYMENT CONTRACT
+    </div>
+    <div class="sub-header">
+        (TO BE TYPED and ALL FIELDS ARE MANDATORY)
+    </div>
+
+    <div class="field-row">
+        <div class="field-label">Employee Name:</div>
+        <div class="field-value">{{ doc.employee_name }}</div>
+    </div>
+
+    <div class="field-row">
+        <div class="field-label">ID No:</div>
+        <div class="field-value">{{ doc.identification_no }}</div>
+    </div>
+
+    <div class="field-row">
+        <div class="field-label">Company Name:</div>
+        <div class="field-value">{{ doc.company }}</div>
+    </div>
+
+    <div class="field-row">
+        <div class="field-label">License No:</div>
+        <div class="field-value">{{ doc.company_license_no }}</div>
+    </div>
+
+    <div class="content">
+        We are pleased to inform you that the following Terms and Conditions of your Employment Contract have been
+        changed with effect from <strong>{{ frappe.utils.formatdate(doc.effective_date, "dd/MM/yyyy") }}</strong>
+    </div>
+
+    <div class="content">
+        The details are as follows:
+    </div>
+
+    <table class="details-table">
+        <tr>
+            <td>Designation</td>
+            <td>{{ doc.designation }}</td>
+        </tr>
+        {% set basic = namespace(amount=0) %}
+        {% set hra = namespace(amount=0) %}
+        {% set transport = namespace(amount=0) %}
+        {% set other = namespace(amount=0) %}
+        
+        {% for component in doc.new_components %}
+            {% set comp_name = frappe.db.get_value("Salary Component", component.salary_component, "salary_component_abbr") or "" %}
+            {% if "basic" in comp_name.lower() %}
+                {% set basic.amount = component.new_amount %}
+            {% elif "hra" in comp_name.lower() or "accommodation" in comp_name.lower() or "house" in comp_name.lower() %}
+                {% set hra.amount = component.new_amount %}
+            {% elif "transport" in comp_name.lower() %}
+                {% set transport.amount = component.new_amount %}
+            {% elif "other" in comp_name.lower() %}
+                {% set other.amount = component.new_amount %}
+            {% endif %}
+        {% endfor %}
+        
+        <tr>
+            <td>Monthly Basic Salary (AED)</td>
+            <td>{{ frappe.format(basic.amount, {"fieldtype": "Currency"}) }}</td>
+        </tr>
+        <tr>
+            <td>Accommodation</td>
+            <td>{{ frappe.format(hra.amount, {"fieldtype": "Currency"}) }}</td>
+        </tr>
+        <tr>
+            <td>Transport</td>
+            <td>{{ frappe.format(transport.amount, {"fieldtype": "Currency"}) }}</td>
+        </tr>
+        <tr>
+            <td>Other Allowance</td>
+            <td>{{ frappe.format(other.amount, {"fieldtype": "Currency"}) }}</td>
+        </tr>
+    </table>
+
+    <div class="content">
+        All other Terms and Conditions mentioned in your Employment Contract remain the same.
+    </div>
+
+    <div class="content">
+        Yours faithfully,
+    </div>
+
+    <div class="signature-section">
+        <div class="signature-box">
+            <div class="company-stamp">
+                <!-- Company stamp will be added here -->
+                {% if frappe.db.get_value("Company", doc.company, "company_logo") %}
+                <img src="{{ frappe.db.get_value('Company', doc.company, 'company_logo') }}" />
+                {% endif %}
+            </div>
+            <div class="signature-line">
+                Company Authorized Signatory & Stamp
+            </div>
+        </div>
+        <div class="signature-box">
+            <div class="signature-line">
+                Employee's Signature
+            </div>
+        </div>
+    </div>
+</body>
+</html>

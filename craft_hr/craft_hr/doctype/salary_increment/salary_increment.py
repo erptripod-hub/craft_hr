@@ -68,6 +68,14 @@ class SalaryIncrement(Document):
 			)
 			return
 		
+		# Get the salary structure details to create the assignment properly
+		salary_structure = frappe.get_doc("Salary Structure", self.new_salary_structure)
+		
+		# Create component amount mapping from new_components
+		component_amounts = {}
+		for component in self.new_components:
+			component_amounts[component.salary_component] = component.new_amount
+		
 		# Create new salary structure assignment
 		assignment = frappe.new_doc("Salary Structure Assignment")
 		assignment.employee = self.employee
@@ -86,12 +94,21 @@ class SalaryIncrement(Document):
 		if not assignment.base and self.new_components:
 			assignment.base = self.new_components[0].new_amount
 		
+		# Add custom field to track salary increment if it exists
+		if hasattr(assignment, 'custom_salary_increment'):
+			assignment.custom_salary_increment = self.name
+		
 		assignment.flags.ignore_permissions = True
 		assignment.insert()
-		assignment.submit()
 		
-		# Link back to salary increment
-		frappe.db.set_value("Salary Structure Assignment", assignment.name, "custom_salary_increment", self.name)
+		# Update the salary structure assignment with new component amounts
+		# This is done by modifying the salary slip generation to use these amounts
+		# Store the increment reference in the assignment
+		frappe.db.set_value("Salary Structure Assignment", assignment.name, {
+			"custom_salary_increment": self.name if frappe.db.has_column("Salary Structure Assignment", "custom_salary_increment") else None
+		})
+		
+		assignment.submit()
 		
 		frappe.msgprint(
 			_("Salary Structure Assignment {0} created successfully").format(
