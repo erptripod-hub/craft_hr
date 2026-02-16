@@ -1,0 +1,254 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2024-02-16 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "employee",
+  "employee_name",
+  "identification_no",
+  "department",
+  "designation",
+  "column_break_1",
+  "company",
+  "company_license_no",
+  "effective_date",
+  "reason",
+  "section_break_current",
+  "current_salary_structure",
+  "current_base",
+  "current_components",
+  "section_break_total_current",
+  "total_current_salary",
+  "section_break_new",
+  "new_salary_structure",
+  "new_components",
+  "section_break_total_new",
+  "total_new_salary",
+  "total_increment",
+  "total_increment_percentage",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "HR-SAL-INC-.YYYY.-",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.passport_number",
+   "fieldname": "identification_no",
+   "fieldtype": "Data",
+   "label": "Emirates ID / Passport Number",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company_license_no",
+   "fieldtype": "Data",
+   "label": "Company License No"
+  },
+  {
+   "fieldname": "effective_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Effective Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Select",
+   "label": "Reason",
+   "options": "\nAnnual Increment\nPromotion\nPerformance Based\nMarket Adjustment\nOther"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_current",
+   "fieldtype": "Section Break",
+   "label": "Current Salary Details"
+  },
+  {
+   "fieldname": "current_salary_structure",
+   "fieldtype": "Link",
+   "label": "Current Salary Structure",
+   "options": "Salary Structure",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_base",
+   "fieldtype": "Currency",
+   "label": "Current Base Salary",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_components",
+   "fieldtype": "Table",
+   "label": "Current Salary Components",
+   "options": "Salary Component Detail",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_total_current",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_current_salary",
+   "fieldtype": "Currency",
+   "label": "Total Current Salary (AED)",
+   "read_only": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "section_break_new",
+   "fieldtype": "Section Break",
+   "label": "New Salary Details"
+  },
+  {
+   "fieldname": "new_salary_structure",
+   "fieldtype": "Link",
+   "label": "New Salary Structure",
+   "options": "Salary Structure",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_components",
+   "fieldtype": "Table",
+   "label": "New Salary Components",
+   "options": "Salary Component Detail"
+  },
+  {
+   "fieldname": "section_break_total_new",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_new_salary",
+   "fieldtype": "Currency",
+   "label": "Total New Salary (AED)",
+   "read_only": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "total_increment",
+   "fieldtype": "Currency",
+   "label": "Total Increment (AED)",
+   "read_only": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "total_increment_percentage",
+   "fieldtype": "Percent",
+   "label": "Total Increment %",
+   "read_only": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Salary Increment",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-02-16 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Craft HR",
+ "name": "Salary Increment",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "employee_name",
+ "track_changes": 1
+}

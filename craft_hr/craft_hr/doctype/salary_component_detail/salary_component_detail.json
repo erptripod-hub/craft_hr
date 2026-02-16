@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "creation": "2024-02-16 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "salary_component",
+  "current_amount",
+  "new_amount",
+  "difference",
+  "percentage_change"
+ ],
+ "fields": [
+  {
+   "fieldname": "salary_component",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Salary Component",
+   "options": "Salary Component",
+   "reqd": 1
+  },
+  {
+   "fieldname": "current_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Current Amount (AED)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "New Amount (AED)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "difference",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Increment",
+   "read_only": 1
+  },
+  {
+   "fieldname": "percentage_change",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "% Change",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2024-02-16 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Craft HR",
+ "name": "Salary Component Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
