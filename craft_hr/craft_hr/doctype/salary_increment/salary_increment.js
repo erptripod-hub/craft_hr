@@ -8,55 +8,67 @@ frappe.ui.form.on('Salary Increment', {
 			frm.set_value('company', frappe.defaults.get_user_default('Company'));
 		}
 	},
-	
+
 	employee: function(frm) {
-		if (frm.doc.employee) {
-			// Fetch current salary details
-			frappe.call({
-				method: 'craft_hr.craft_hr.doctype.salary_increment.salary_increment.get_current_salary_details',
-				args: {
-					employee: frm.doc.employee
-				},
-				callback: function(r) {
-					if (r.message && r.message.salary_structure) {
-						// Set current salary structure and base
-						frm.set_value('current_salary_structure', r.message.salary_structure);
-						frm.set_value('current_base', r.message.base);
-						frm.set_value('new_salary_structure', r.message.salary_structure);
-						
-						// Clear existing tables
-						frm.clear_table('current_components');
-						frm.clear_table('new_components');
-						
-						// Populate current components table (read-only)
-						if (r.message.components) {
-							r.message.components.forEach(function(component) {
-								let current_row = frm.add_child('current_components');
-								current_row.salary_component = component.salary_component;
-								current_row.current_amount = component.current_amount;
-								current_row.new_amount = 0;
-								current_row.difference = 0;
-								current_row.percentage_change = 0;
-								
-								// Also add to new components table (editable)
-								let new_row = frm.add_child('new_components');
-								new_row.salary_component = component.salary_component;
-								new_row.current_amount = component.current_amount;
-								new_row.new_amount = component.new_amount;
-								new_row.difference = 0;
-								new_row.percentage_change = 0;
-							});
-						}
-						
-						frm.refresh_fields(['current_components', 'new_components']);
-						frm.refresh_fields(['current_salary_structure', 'current_base', 'new_salary_structure']);
-						
-						// Calculate totals
-						calculate_totals(frm);
-					}
+		if (!frm.doc.employee) return;
+
+		// Step 1: Fetch employee fields (company, identification_no)
+		frappe.db.get_value('Employee', frm.doc.employee, 
+			['company', 'identification_no'],
+			function(emp) {
+				if (emp) {
+					if (emp.company)           frm.set_value('company', emp.company);
+					if (emp.identification_no) frm.set_value('identification_no', emp.identification_no);
 				}
-			});
-		}
+			}
+		);
+
+		// Step 2: Fetch current salary details from Salary Structure Assignment
+		frappe.call({
+			method: 'craft_hr.craft_hr.doctype.salary_increment.salary_increment.get_current_salary_details',
+			args: { employee: frm.doc.employee },
+			callback: function(r) {
+				if (!r.message || !r.message.salary_structure) return;
+
+				// Set salary structure fields
+				frm.set_value('current_salary_structure', r.message.salary_structure);
+				frm.set_value('current_base', r.message.base);
+				frm.set_value('new_salary_structure', r.message.salary_structure);
+
+				// Set company from assignment if not already set
+				if (r.message.company && !frm.doc.company) {
+					frm.set_value('company', r.message.company);
+				}
+
+				// Clear tables
+				frm.clear_table('current_components');
+				frm.clear_table('new_components');
+
+				// Populate both tables
+				(r.message.components || []).forEach(function(component) {
+					// Current (read-only reference)
+					let cur = frm.add_child('current_components');
+					cur.salary_component  = component.salary_component;
+					cur.current_amount    = component.current_amount;
+					cur.new_amount        = component.current_amount;
+					cur.difference        = 0;
+					cur.percentage_change = 0;
+
+					// New (editable)
+					let nw = frm.add_child('new_components');
+					nw.salary_component  = component.salary_component;
+					nw.current_amount    = component.current_amount;
+					nw.new_amount        = component.current_amount;
+					nw.difference        = 0;
+					nw.percentage_change = 0;
+				});
+
+				frm.refresh_fields(['current_components', 'new_components',
+					'current_salary_structure', 'current_base', 'new_salary_structure']);
+
+				calculate_totals(frm);
+			}
+		});
 	}
 });
 
