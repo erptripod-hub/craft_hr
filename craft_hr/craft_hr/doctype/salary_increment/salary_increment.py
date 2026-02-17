@@ -156,7 +156,7 @@ class SalaryIncrement(Document):
 
 @frappe.whitelist()
 def get_current_salary_details(employee):
-	"""Get current salary structure assignment and components for an employee"""
+	"""Get current salary details directly from Salary Structure Assignment custom fields"""
 	
 	if not employee:
 		return {}
@@ -168,7 +168,13 @@ def get_current_salary_details(employee):
 			"employee": employee,
 			"docstatus": 1
 		},
-		fieldname=["name", "salary_structure", "base", "from_date"],
+		fieldname=[
+			"name", "salary_structure", "from_date",
+			"basic", "hra", "transport_allowance", "fuel_allowance",
+			"other_allowance", "car_allowance", "cost_of_living_allowance",
+			"overtime_hourly_rate", "holiday_overtime_rate", "mobile_allowance",
+			"leave_encashment_amount_per_day", "c3_number", "total_salary"
+		],
 		order_by="from_date desc",
 		as_dict=1
 	)
@@ -176,69 +182,31 @@ def get_current_salary_details(employee):
 	if not current_assignment:
 		frappe.msgprint(_("No active Salary Structure Assignment found for this employee"))
 		return {}
-	
+
+	# Build components list directly from the custom fields on the assignment
+	# Map field name -> Salary Component name (must match exactly in ERPNext)
+	component_map = [
+		("basic",                        "Basic"),
+		("hra",                          "HRA"),
+		("transport_allowance",          "Transport Allowance"),
+		("fuel_allowance",               "Fuel Allowance"),
+		("mobile_allowance",             "Mobile Allowance"),
+		("cost_of_living_allowance",     "Cost of Living Allowance"),
+		("other_allowance",              "Other Allowances"),
+		("car_allowance",                "Car Allowance"),
+	]
+
 	components = []
-	component_amounts = {}
-
-	# Step 1: Try to get amounts from the latest submitted Salary Slip
-	latest_slip = frappe.db.get_value(
-		"Salary Slip",
-		filters={
-			"employee": employee,
-			"docstatus": 1
-		},
-		fieldname="name",
-		order_by="end_date desc"
-	)
-
-	if latest_slip:
-		slip_earnings = frappe.get_all(
-			"Salary Detail",
-			filters={
-				"parent": latest_slip,
-				"parentfield": "earnings"
-			},
-			fields=["salary_component", "amount"],
-			order_by="idx"
-		)
-		component_amounts = {e.salary_component: flt(e.amount) for e in slip_earnings}
-
-	# Step 2: Get all earnings components from the salary structure
-	earnings = frappe.get_all(
-		"Salary Detail",
-		filters={
-			"parent": current_assignment.salary_structure,
-			"parentfield": "earnings"
-		},
-		fields=["salary_component", "amount", "formula", "amount_based_on_formula"],
-		order_by="idx"
-	)
-
-	for earning in earnings:
-		# Get amount - priority: salary slip > structure amount
-		amount = component_amounts.get(earning.salary_component, 0)
-		
-		# If amount is 0 and structure has a fixed amount (not formula), use it
-		if flt(amount) == 0 and not earning.amount_based_on_formula:
-			amount = flt(earning.amount)
-
-		# If amount is still 0, try formula with base salary
-		if flt(amount) == 0 and earning.amount_based_on_formula and earning.formula:
-			if "base" in (earning.formula or "").lower():
-				try:
-					base = flt(current_assignment.base)
-					amount = flt(eval(earning.formula.replace("base", str(base))))
-				except Exception:
-					amount = 0
-
+	for field_name, component_name in component_map:
+		amount = flt(current_assignment.get(field_name) or 0)
 		components.append({
-			"salary_component": earning.salary_component,
-			"current_amount": flt(amount),
-			"new_amount": flt(amount)
+			"salary_component": component_name,
+			"current_amount":   amount,
+			"new_amount":       amount
 		})
 
 	return {
 		"salary_structure": current_assignment.salary_structure,
-		"base": flt(current_assignment.base),
-		"components": components
+		"base":             flt(current_assignment.get("basic") or 0),
+		"components":       components
 	}
