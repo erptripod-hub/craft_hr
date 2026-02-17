@@ -19,6 +19,17 @@ frappe.ui.form.on('Salary Increment', {
 				if (emp) {
 					if (emp.company)           frm.set_value('company', emp.company);
 					if (emp.identification_no) frm.set_value('identification_no', emp.identification_no);
+				} else {
+					// fallback: try passport_number
+					frappe.db.get_value('Employee', frm.doc.employee, 
+						['company', 'passport_number'],
+						function(emp2) {
+							if (emp2) {
+								if (emp2.company)         frm.set_value('company', emp2.company);
+								if (emp2.passport_number) frm.set_value('identification_no', emp2.passport_number);
+							}
+						}
+					);
 				}
 			}
 		);
@@ -94,8 +105,8 @@ frappe.ui.form.on('Salary Component Detail', {
 });
 
 function calculate_totals(frm) {
-	// Calculate total current salary
-	let total_current = flt(frm.doc.current_base);
+	// Calculate total current salary from components only (Basic already in components)
+	let total_current = 0;
 	(frm.doc.current_components || []).forEach(function(row) {
 		total_current += flt(row.current_amount);
 	});

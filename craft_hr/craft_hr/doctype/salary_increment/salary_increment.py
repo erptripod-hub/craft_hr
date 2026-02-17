@@ -19,17 +19,15 @@ class SalaryIncrement(Document):
 	
 	def calculate_totals(self):
 		"""Calculate total current and new salaries"""
-		# Calculate total current salary
-		self.total_current_salary = flt(self.current_base)
+		# Calculate total current salary from components only (Basic already included)
+		self.total_current_salary = 0
 		for row in self.current_components:
 			self.total_current_salary += flt(row.current_amount)
 		
-		# Calculate total new salary
+		# Calculate total new salary and per-component difference
 		self.total_new_salary = 0
 		for row in self.new_components:
 			self.total_new_salary += flt(row.new_amount)
-			
-			# Calculate difference and percentage for each component
 			row.difference = flt(row.new_amount) - flt(row.current_amount)
 			if flt(row.current_amount) > 0:
 				row.percentage_change = (row.difference / flt(row.current_amount)) * 100

@@ -58,10 +58,10 @@
    "read_only": 1
   },
   {
-   "fetch_from": "employee.passport_number",
+   "fetch_from": "employee.identification_no",
    "fieldname": "identification_no",
    "fieldtype": "Data",
-   "label": "Emirates ID / Passport Number",
+   "label": "Emirates ID",
    "read_only": 1
   },
   {
