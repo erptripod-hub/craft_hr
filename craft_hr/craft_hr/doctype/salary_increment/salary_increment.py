@@ -170,10 +170,9 @@ def get_current_salary_details(employee):
 		},
 		fieldname=[
 			"name", "salary_structure", "from_date",
-			"basic", "hra", "transport_allowance", "fuel_allowance",
-			"other_allowance", "car_allowance", "cost_of_living_allowance",
-			"overtime_hourly_rate", "holiday_overtime_rate", "mobile_allowance",
-			"leave_encashment_amount_per_day", "c3_number", "total_salary"
+			"sc_basic", "sc_hra", "sc_transport", "sc_cola",
+			"sc_fuel", "sc_other", "sc_car", "sc_mobile",
+			"custom_c3_number", "custom_total_salary"
 		],
 		order_by="from_date desc",
 		as_dict=1
@@ -184,16 +183,16 @@ def get_current_salary_details(employee):
 		return {}
 
 	# Build components list directly from the custom fields on the assignment
-	# Map field name -> Salary Component name (must match exactly in ERPNext)
+	# Exact field names from Salary Structure Assignment custom fields
 	component_map = [
-		("basic",                        "Basic"),
-		("hra",                          "HRA"),
-		("transport_allowance",          "Transport Allowance"),
-		("fuel_allowance",               "Fuel Allowance"),
-		("mobile_allowance",             "Mobile Allowance"),
-		("cost_of_living_allowance",     "Cost of Living Allowance"),
-		("other_allowance",              "Other Allowances"),
-		("car_allowance",                "Car Allowance"),
+		("sc_basic",       "Basic"),
+		("sc_hra",         "HRA"),
+		("sc_transport",   "Transport Allowance"),
+		("sc_cola",        "Cost of Living Allowance"),
+		("sc_fuel",        "Fuel Allowance"),
+		("sc_other",       "Other Allowances"),
+		("sc_car",         "Car Allowance"),
+		("sc_mobile",      "Mobile Allowance"),
 	]
 
 	components = []
@@ -207,6 +206,6 @@ def get_current_salary_details(employee):
 
 	return {
 		"salary_structure": current_assignment.salary_structure,
-		"base":             flt(current_assignment.get("basic") or 0),
+		"base":             flt(current_assignment.get("sc_basic") or 0),
 		"components":       components
 	}
