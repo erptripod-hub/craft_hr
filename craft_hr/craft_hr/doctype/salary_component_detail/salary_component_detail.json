@@ -14,10 +14,9 @@
  "fields": [
   {
    "fieldname": "salary_component",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Salary Component",
-   "options": "Salary Component",
    "reqd": 1
   },
   {
