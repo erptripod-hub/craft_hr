@@ -13,9 +13,9 @@ class SalaryIncrement(Document):
 		self.calculate_totals()
 	
 	def validate_dates(self):
-		"""Validate effective date is not in the past"""
-		if getdate(self.effective_date) < getdate(frappe.utils.today()):
-			frappe.throw(_("Effective Date cannot be in the past"))
+		"""Validate effective date exists"""
+		if not self.effective_date:
+			frappe.throw(_("Please set an Effective Date"))
 	
 	def calculate_totals(self):
 		"""Calculate total current and new salaries"""
@@ -161,7 +161,7 @@ def get_current_salary_details(employee):
 	if not employee:
 		return {}
 	
-	# Get the latest salary structure assignment
+	# Get the latest submitted salary structure assignment
 	current_assignment = frappe.db.get_value(
 		"Salary Structure Assignment",
 		filters={
@@ -177,22 +177,10 @@ def get_current_salary_details(employee):
 		frappe.msgprint(_("No active Salary Structure Assignment found for this employee"))
 		return {}
 	
-	# Get salary components from the structure
 	components = []
-	
-	# Get earnings from salary structure
-	earnings = frappe.get_all(
-		"Salary Detail",
-		filters={
-			"parent": current_assignment.salary_structure,
-			"parentfield": "earnings"
-		},
-		fields=["salary_component", "amount"],
-		order_by="idx"
-	)
-	
-	# Get the actual amounts from salary structure assignment
-	# First, get the salary slip to see actual amounts
+	component_amounts = {}
+
+	# Step 1: Try to get amounts from the latest submitted Salary Slip
 	latest_slip = frappe.db.get_value(
 		"Salary Slip",
 		filters={
@@ -200,36 +188,57 @@ def get_current_salary_details(employee):
 			"docstatus": 1
 		},
 		fieldname="name",
-		order_by="posting_date desc"
+		order_by="end_date desc"
 	)
-	
+
 	if latest_slip:
-		# Get actual amounts from latest salary slip
 		slip_earnings = frappe.get_all(
 			"Salary Detail",
 			filters={
 				"parent": latest_slip,
 				"parentfield": "earnings"
 			},
-			fields=["salary_component", "amount"]
+			fields=["salary_component", "amount"],
+			order_by="idx"
 		)
-		
-		component_amounts = {e.salary_component: e.amount for e in slip_earnings}
-	else:
-		component_amounts = {}
-	
+		component_amounts = {e.salary_component: flt(e.amount) for e in slip_earnings}
+
+	# Step 2: Get all earnings components from the salary structure
+	earnings = frappe.get_all(
+		"Salary Detail",
+		filters={
+			"parent": current_assignment.salary_structure,
+			"parentfield": "earnings"
+		},
+		fields=["salary_component", "amount", "formula", "amount_based_on_formula"],
+		order_by="idx"
+	)
+
 	for earning in earnings:
-		# Use actual amount from salary slip if available, otherwise use structure amount
-		amount = component_amounts.get(earning.salary_component, earning.amount)
+		# Get amount - priority: salary slip > structure amount
+		amount = component_amounts.get(earning.salary_component, 0)
 		
+		# If amount is 0 and structure has a fixed amount (not formula), use it
+		if flt(amount) == 0 and not earning.amount_based_on_formula:
+			amount = flt(earning.amount)
+
+		# If amount is still 0, try formula with base salary
+		if flt(amount) == 0 and earning.amount_based_on_formula and earning.formula:
+			if "base" in (earning.formula or "").lower():
+				try:
+					base = flt(current_assignment.base)
+					amount = flt(eval(earning.formula.replace("base", str(base))))
+				except Exception:
+					amount = 0
+
 		components.append({
 			"salary_component": earning.salary_component,
-			"current_amount": amount,
-			"new_amount": amount  # Start with current amount
+			"current_amount": flt(amount),
+			"new_amount": flt(amount)
 		})
-	
+
 	return {
 		"salary_structure": current_assignment.salary_structure,
-		"base": current_assignment.base,
+		"base": flt(current_assignment.base),
 		"components": components
 	}
