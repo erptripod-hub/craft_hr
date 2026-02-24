@@ -94,6 +94,10 @@ class SalaryIncrement(Document):
 			if hasattr(assignment, field):
 				setattr(assignment, field, component_amounts.get(component, 0))
 
+		# Set custom_total_salary
+		if hasattr(assignment, 'custom_total_salary'):
+			assignment.custom_total_salary = flt(self.total_new_salary)
+
 		assignment.flags.ignore_permissions = True
 		assignment.insert()
 		assignment.submit()
