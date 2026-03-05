@@ -125,6 +125,7 @@ override_doctype_class = {
 	# "ToDo": "custom_app.overrides.CustomToDo"
 	"Leave Encashment":"craft_hr.overrides.leave_encashment.CustomLeaveEncashment",
 	"Payroll Entry":"craft_hr.overrides.payroll_entry.CustomPayrollEntry",
+	"Employee Attendance Tool":"craft_hr.overrides.attendance_tool.CustomEmployeeAttendanceTool",
 
 
 
