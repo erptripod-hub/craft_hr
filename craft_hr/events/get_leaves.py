@@ -29,39 +29,47 @@ def get_leaves(date_of_joining, allocation_start_date, leave_distribution_templa
     return leaves
 
 def get_earned_leave(employee=None):
-    filters = {
-        'docstatus': 1,
-        'custom_leave_distribution_template': ['is', 'set'],
-        'custom_status': "Ongoing"
-    }
-    if employee:
-        filters['employee'] = employee
-    for la in frappe.db.get_list('Leave Allocation', filters):
-        doc = frappe.get_doc('Leave Allocation', la.name)
-        to_date = frappe.utils.getdate()
-        if doc.to_date < to_date:
-            to_date = doc.to_date
-        earned_leaves = get_leaves(
-            doc.custom_date_of_joining,
-            to_date,
-            doc.custom_leave_distribution_template
-        )
-        new_used_leaves = frappe.db.count(
-            'Attendance',
-            {
-                'employee': doc.employee,
-                'leave_type': doc.leave_type,
-                'docstatus': 1,
-                'attendance_date': ['between', [doc.from_date, doc.to_date]]
-            }
-        )
-        doc.new_leaves_allocated = round(earned_leaves - doc.custom_opening_used_leaves, 2)
-        doc.custom_used_leaves = round(doc.custom_opening_used_leaves + new_used_leaves, 2)
-        doc.custom_available_leaves = round(doc.new_leaves_allocated - new_used_leaves, 2)
-        
-        frappe.db.set_value('Leave Allocation', doc.name, {
-            'new_leaves_allocated': doc.new_leaves_allocated,
-            'custom_used_leaves': doc.custom_used_leaves,
-            'custom_available_leaves': doc.custom_available_leaves
-        }, update_modified=True)
-        frappe.db.commit()
+    # DISABLED: This function was overriding manual leave allocations
+    # Use standard ERPNext leave allocation or manual DOJ-based scripts instead
+    # To re-enable: uncomment the code below and ensure all allocations have:
+    # - custom_leave_distribution_template
+    # - custom_opening_used_leaves
+    # - custom_date_of_joining
+    pass
+    
+    # filters = {
+    #     'docstatus': 1,
+    #     'custom_leave_distribution_template': ['is', 'set'],
+    #     'custom_status': "Ongoing"
+    # }
+    # if employee:
+    #     filters['employee'] = employee
+    # for la in frappe.db.get_list('Leave Allocation', filters):
+    #     doc = frappe.get_doc('Leave Allocation', la.name)
+    #     to_date = frappe.utils.getdate()
+    #     if doc.to_date < to_date:
+    #         to_date = doc.to_date
+    #     earned_leaves = get_leaves(
+    #         doc.custom_date_of_joining,
+    #         to_date,
+    #         doc.custom_leave_distribution_template
+    #     )
+    #     new_used_leaves = frappe.db.count(
+    #         'Attendance',
+    #         {
+    #             'employee': doc.employee,
+    #             'leave_type': doc.leave_type,
+    #             'docstatus': 1,
+    #             'attendance_date': ['between', [doc.from_date, doc.to_date]]
+    #         }
+    #     )
+    #     doc.new_leaves_allocated = round(earned_leaves - doc.custom_opening_used_leaves, 2)
+    #     doc.custom_used_leaves = round(doc.custom_opening_used_leaves + new_used_leaves, 2)
+    #     doc.custom_available_leaves = round(doc.new_leaves_allocated - new_used_leaves, 2)
+    #     
+    #     frappe.db.set_value('Leave Allocation', doc.name, {
+    #         'new_leaves_allocated': doc.new_leaves_allocated,
+    #         'custom_used_leaves': doc.custom_used_leaves,
+    #         'custom_available_leaves': doc.custom_available_leaves
+    #     }, update_modified=True)
+    #     frappe.db.commit()

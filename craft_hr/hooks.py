@@ -171,10 +171,12 @@ scheduler_events = {
 	# "all": [
 	# 	"craft_hr.tasks.all"
 	# ],
-	"daily": [
-		"craft_hr.tasks.daily.reset_leave_allocation",
-		"craft_hr.tasks.daily.update_leave_allocations"
-	],
+	# DISABLED: These daily tasks were overriding manual leave allocations
+	# Re-enable only if using Craft HR's distribution template system
+	# "daily": [
+	# 	"craft_hr.tasks.daily.reset_leave_allocation",
+	# 	"craft_hr.tasks.daily.update_leave_allocations"
+	# ],
 	# "hourly": [
 	# 	"craft_hr.tasks.hourly"
 	# ],
