@@ -1,15 +1,13 @@
 [project]
 name = "craft_hr"
 authors = [
-    {name = "Your Name", email = "you@example.com"}
+    {name = "erptripod-hub", email = "admin@erptripod.com"}
 ]
-description = "Craft HR App"
+description = "Craft HR - UAE Labour Law"
 requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
-dependencies = [
-    "frappe~=15.0.0"
-]
+dependencies = []
 
 [build-system]
 requires = ["flit_core >=3.4,<4"]
