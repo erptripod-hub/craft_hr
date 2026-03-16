@@ -1,0 +1,19 @@
+[project]
+name = "craft_hr"
+authors = [
+    {name = "Your Name", email = "you@example.com"}
+]
+description = "Craft HR App"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    "frappe~=15.0.0"
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.module]
+name = "craft_hr"
