@@ -1,75 +1,39 @@
+"""
+CRAFT HR - Leave Distribution (DEPRECATED)
+==========================================
+This module is deprecated. ERPNext native Earned Leave is used instead.
+
+The Leave Distribution Template feature has been disabled because:
+1. ERPNext has built-in earned leave functionality that works correctly
+2. Having two systems caused conflicts and wrong balances
+3. The custom fields were not syncing with ERPNext standard fields
+
+DO NOT RE-ENABLE this code. Use ERPNext Leave Type > Is Earned Leave instead.
+"""
+
 import frappe
 
 def get_leaves(date_of_joining, allocation_start_date, leave_distribution_template=None):
-    opening_months = round(frappe.utils.date_diff(allocation_start_date, date_of_joining) / 365 * 12)
-    if opening_months < 0:
-        frappe.throw("Leave Period from date should be after employee joining date")
-    month_array = {}
-    cumulative_allocation = {}
-    template = frappe.get_doc('Leave Distribution Template', leave_distribution_template)
-    for row in template.leave_distribution:
-        if row.end != 0:
-            for i in range(row.start, row.end + 1):
-                month_array[i] = row.monthly_allocation
-        else:
-            month_array[row.start] = row.monthly_allocation
-            month_array[row.end] = row.monthly_allocation
-    allocation = 0
-    for i in range(1, max(list(month_array.keys())) + 1):
-        allocation += month_array[i]
-        cumulative_allocation[i] = allocation
-    cumulative_allocation[0] = month_array[0]
-    max_months = max(list(cumulative_allocation.keys()))
-    if opening_months <= max(list(month_array.keys())):
-        leaves = cumulative_allocation[opening_months]
-    else:
-        leaves = cumulative_allocation[max_months] + cumulative_allocation[0] * (opening_months - max_months)
-    if opening_months == 0:
-        leaves = 0
-    return leaves
+    """
+    DEPRECATED: This function is no longer used.
+    ERPNext native earned leave handles monthly accrual.
+    
+    Keeping this function stub to prevent import errors in existing code.
+    """
+    frappe.log_error(
+        "get_leaves() is deprecated. Use ERPNext native earned leave instead.",
+        "Craft HR Deprecation Warning"
+    )
+    return 0
+
 
 def get_earned_leave(employee=None):
-    # DISABLED: This function was overriding manual leave allocations
-    # Use standard ERPNext leave allocation or manual DOJ-based scripts instead
-    # To re-enable: uncomment the code below and ensure all allocations have:
-    # - custom_leave_distribution_template
-    # - custom_opening_used_leaves
-    # - custom_date_of_joining
-    pass
+    """
+    DEPRECATED: This function is no longer used.
+    ERPNext native earned leave handles monthly accrual.
     
-    # filters = {
-    #     'docstatus': 1,
-    #     'custom_leave_distribution_template': ['is', 'set'],
-    #     'custom_status': "Ongoing"
-    # }
-    # if employee:
-    #     filters['employee'] = employee
-    # for la in frappe.db.get_list('Leave Allocation', filters):
-    #     doc = frappe.get_doc('Leave Allocation', la.name)
-    #     to_date = frappe.utils.getdate()
-    #     if doc.to_date < to_date:
-    #         to_date = doc.to_date
-    #     earned_leaves = get_leaves(
-    #         doc.custom_date_of_joining,
-    #         to_date,
-    #         doc.custom_leave_distribution_template
-    #     )
-    #     new_used_leaves = frappe.db.count(
-    #         'Attendance',
-    #         {
-    #             'employee': doc.employee,
-    #             'leave_type': doc.leave_type,
-    #             'docstatus': 1,
-    #             'attendance_date': ['between', [doc.from_date, doc.to_date]]
-    #         }
-    #     )
-    #     doc.new_leaves_allocated = round(earned_leaves - doc.custom_opening_used_leaves, 2)
-    #     doc.custom_used_leaves = round(doc.custom_opening_used_leaves + new_used_leaves, 2)
-    #     doc.custom_available_leaves = round(doc.new_leaves_allocated - new_used_leaves, 2)
-    #     
-    #     frappe.db.set_value('Leave Allocation', doc.name, {
-    #         'new_leaves_allocated': doc.new_leaves_allocated,
-    #         'custom_used_leaves': doc.custom_used_leaves,
-    #         'custom_available_leaves': doc.custom_available_leaves
-    #     }, update_modified=True)
-    #     frappe.db.commit()
+    Keeping this function stub to prevent import errors in existing code.
+    """
+    # DO NOT UNCOMMENT OR MODIFY THIS FUNCTION
+    # The craft_hr leave distribution system has been replaced by ERPNext native earned leave
+    pass

@@ -11,7 +11,7 @@ fixtures = [
     {'dt':'Custom Field', 'filters':[['module', 'in', {"Craft HR", "OT Mgmt"}]]},
     {'dt':'Property Setter', 'filters':[['module', 'in', {"Craft HR", "OT Mgmt"}]]},
     {'dt':'Report', 'filters':[['name', 'in', {"Overtime Summary"}]]},
-    ]
+]
 
 # Includes in <head>
 # ------------------
@@ -35,11 +35,10 @@ fixtures = [
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
-
-doctype_js = {
-    "Leave Allocation":"public/js/leave_allocation.js"
-}
+# REMOVED: Leave Allocation JS that added distribution fields
+# doctype_js = {
+#     "Leave Allocation":"public/js/leave_allocation.js"
+# }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -122,36 +121,28 @@ after_install = "craft_hr.install.after_install"
 # Override standard doctype classes
 
 override_doctype_class = {
-	# "ToDo": "custom_app.overrides.CustomToDo"
 	"Leave Encashment":"craft_hr.overrides.leave_encashment.CustomLeaveEncashment",
 	"Payroll Entry":"craft_hr.overrides.payroll_entry.CustomPayrollEntry",
 	"Employee Attendance Tool":"craft_hr.overrides.attendance_tool.CustomEmployeeAttendanceTool",
-
-
-
 }
 
 # Document Events
 # ---------------
-# Hook on document methods and events
-
-# doc_events = {
-#	"*": {
-#		"on_update": "method",
-#		"on_cancel": "method",
-#		"on_trash": "method"
-#	}
-# }
+# REMOVED: Leave Allocation hooks (distribution logic deprecated)
+# REMOVED: Leave Application hooks (not needed)
+# KEPT: Attendance and Salary Slip hooks (OT management)
 
 doc_events = {
-    "Leave Allocation":{
-        "validate": "craft_hr.events.leave_allocation.validate",
-        "before_submit": "craft_hr.events.leave_allocation.before_submit",
-        # "after_submit": "craft_hr.events.leave_allocation.after_submit",
-    },
-    "Leave Application":{
-        "on_submit": "craft_hr.events.leave_application.on_submit"
-    },
+    # REMOVED - Leave distribution is now handled by ERPNext native earned leave
+    # "Leave Allocation":{
+    #     "validate": "craft_hr.events.leave_allocation.validate",
+    #     "before_submit": "craft_hr.events.leave_allocation.before_submit",
+    # },
+    # "Leave Application":{
+    #     "on_submit": "craft_hr.events.leave_application.on_submit"
+    # },
+    
+    # KEPT - OT/Attendance management
     "Attendance":{
         "on_submit": "craft_hr.events.attendance.on_submit",
         "on_cancel": "craft_hr.events.attendance.on_cancel"
@@ -159,32 +150,19 @@ doc_events = {
 	"Salary Slip": {
 		"before_validate": "craft_hr.events.salary_slip.before_validate"
 	},
- #    "Shift Type": {
- #        "before_validate":"craft_hr.events.shift_type.before_validate"
-	# }
 }
 
 # Scheduled Tasks
 # ---------------
+# REMOVED: Daily leave allocation tasks (deprecated)
+# ERPNext handles leave accrual via Leave Type > Is Earned Leave
 
 scheduler_events = {
-	# "all": [
-	# 	"craft_hr.tasks.all"
-	# ],
-	# DISABLED: These daily tasks were overriding manual leave allocations
-	# Re-enable only if using Craft HR's distribution template system
+	# PERMANENTLY DISABLED - DO NOT RE-ENABLE
+	# These tasks were overriding manual leave allocations and conflicting with ERPNext
 	# "daily": [
 	# 	"craft_hr.tasks.daily.reset_leave_allocation",
 	# 	"craft_hr.tasks.daily.update_leave_allocations"
-	# ],
-	# "hourly": [
-	# 	"craft_hr.tasks.hourly"
-	# ],
-	# "weekly": [
-	# 	"craft_hr.tasks.weekly.update_leave_allocations"
-	# ],
-	# "monthly": [
-	# 	"craft_hr.tasks.monthly"
 	# ],
 }
 
@@ -208,8 +186,7 @@ scheduler_events = {
 # }
 
 override_doctype_dashboards = {
-    "Employee": "craft_hr.overrides.dashboard_overrides.get_dashboard_for_employee",
-
+	"Employee": "craft_hr.overrides.dashboard_overrides.get_dashboard_for_employee",
 }
 
 # exempt linked doctypes from being automatically cancelled
@@ -261,8 +238,3 @@ override_doctype_dashboards = {
 # auth_hooks = [
 #	"craft_hr.auth.validate"
 # ]
-
-#TODO: Not Working. 2 overrides...
-override_doctype_dashboards = {
-	"Employee": "craft_hr.overrides.dashboard_overrides.get_dashboard_for_employee",
-}

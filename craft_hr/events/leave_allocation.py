@@ -1,25 +1,43 @@
+"""
+CRAFT HR - Leave Allocation Events (SIMPLIFIED)
+================================================
+Stripped-down version that removes the broken distribution logic.
+ERPNext native earned leave handles monthly accrual.
+"""
+
 import frappe
-from craft_hr.events.get_leaves import get_leaves, get_earned_leave
 
-def validate(doc,method):
-    # TODO: use is_earned_leave from inside leave type for this logic
-    if doc.custom_is_earned_leave and doc.custom_leave_distribution_template:
-        total_opening_leaves = get_leaves(doc.custom_date_of_joining,doc.from_date, doc.custom_leave_distribution_template) or 0
-        doc.custom_used_leaves = total_opening_leaves - doc.custom_opening_leaves
-        doc.custom_opening_used_leaves = total_opening_leaves - doc.custom_opening_leaves
-        doc.new_leaves_allocated = doc.custom_opening_leaves
-        doc.custom_available_leaves = doc.custom_opening_leaves
 
-def before_submit(doc,method):
-    if doc.custom_is_earned_leave:
-        get_earned_leave(doc.employee)
+def validate(doc, method):
+    """
+    Validate leave allocation.
+    
+    REMOVED: Distribution template calculations (now using ERPNext native earned leave)
+    """
+    # The old code that calculated leaves based on distribution template
+    # has been removed. ERPNext handles this natively via Leave Type settings.
+    pass
 
-#TODO: Make sure there is no leave application across the leave allocation after today date before closing
+
+def before_submit(doc, method):
+    """
+    Before submit hook for leave allocation.
+    
+    REMOVED: get_earned_leave call (now using ERPNext native earned leave)
+    """
+    # The old code that called get_earned_leave has been removed.
+    # ERPNext handles accrual natively via Leave Type > Is Earned Leave
+    pass
+
 
 @frappe.whitelist()
 def close_allocation(docname):
+    """
+    Close a leave allocation.
+    
+    SIMPLIFIED: Just sets status to Closed without recalculating
+    """
     doc = frappe.get_doc("Leave Allocation", docname)
-    #Running get earned leave to ensure correct calculation of balance leave before closing
-    get_earned_leave(doc.employee)
     doc.db_set("custom_status", "Closed")
     doc.db_set("to_date", frappe.utils.nowdate())
+    frappe.msgprint(f"Leave Allocation {docname} has been closed.")
