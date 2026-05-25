@@ -35,10 +35,9 @@ fixtures = [
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# REMOVED: Leave Allocation JS that added distribution fields
-# doctype_js = {
-#     "Leave Allocation":"public/js/leave_allocation.js"
-# }
+doctype_js = {
+    "Employee": "public/js/employee.js"
+}
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
