@@ -14,7 +14,7 @@ from datetime import datetime
 # Company mappings
 COMPANY_REGION = {
     "TRIPOD GLOBAL SHOPFIT MANUFACTURING COMPANY": "KSA",
-    "Tripod Media FZ LLC": "UAE"
+    "Tripod Middle East FZ LLC": "UAE"
 }
 
 # Leave Policy mappings (updated yearly)
